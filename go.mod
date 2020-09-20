@@ -1,3 +1,3 @@
-module brimo.bri.co.id/base64ToTLVRefine
+module qrcpm/base64totlv
 
 go 1.12

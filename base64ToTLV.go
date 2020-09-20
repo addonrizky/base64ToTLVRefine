@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"brimo.bri.co.id/base64ToTLVRefine/constant"
+	"qrcpm/base64totlv/constant"
 )
 
 //GetTLV is a function to conver base64 QR into TLV EMV in QRIS rule
