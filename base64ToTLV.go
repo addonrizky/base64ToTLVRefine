@@ -2,6 +2,7 @@ package base64totlvrefine
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -10,7 +11,7 @@ import (
 )
 
 //GetTLV is a function to conver base64 QR into TLV EMV in QRIS rule
-func GetTLV(base64QR string) map[string]string {
+func GetTLV(base64QR string) (map[string]string, error) {
 
 	defer func() { //catch or finally
 		if err := recover(); err != nil { //catch
@@ -34,9 +35,7 @@ func GetTLV(base64QR string) map[string]string {
 		}
 
 		if constantRule["tag"+tagLabel] == nil {
-			fmt.Println("unknown tag : " + tagLabel)
-			tagMap[tagLabel] = "tag not found"
-			return tagMap
+			return nil, errors.New("unknown tag : " + tagLabel)
 		}
 
 		tagRule := constantRule["tag"+tagLabel].(map[string]interface{})
@@ -66,16 +65,12 @@ func GetTLV(base64QR string) map[string]string {
 		}
 
 		if isRulelengthConsidered == true && tagLenExpected != tagRule["length"] {
-			tagMap[tagLabel] = "invalid length " + tagLabel
-			return tagMap
+			return nil, errors.New("invalid length " + tagLabel)
 		}
 
 		if tagLabel == "61" || tagLabel == "63" {
 			if tagValueEndIndex != len(base64QR) {
-
-				fmt.Println("invalid 61 " + strconv.Itoa(tagValueEndIndex) + " " + strconv.Itoa(len(base64QR)))
-				tagMap[tagLabel] = "invalid 61"
-				return tagMap
+				return nil, errors.New("invalid length, expected and actual length not match for tag : " + tagLabel)
 			}
 			tagValueEndIndex = runningIndex + 4
 		}
@@ -87,7 +82,7 @@ func GetTLV(base64QR string) map[string]string {
 		}
 	}
 
-	return tagMap
+	return tagMap, nil
 }
 
 func hexaNumberToInteger(hexaString string) string {
