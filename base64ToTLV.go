@@ -90,6 +90,8 @@ func GetTLV(base64QR string) (map[string]string, error) {
 		}
 	}
 
+	tagMap["tlvemv"] = hexaSlice
+
 	return tagMap, nil
 }
 
