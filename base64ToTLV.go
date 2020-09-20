@@ -1,6 +1,8 @@
 package base64totlvrefine
 
 import (
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,6 +21,12 @@ func GetTLV(base64QR string) (map[string]string, error) {
 		}
 	}()
 
+	decodedBase64, err := base64.StdEncoding.DecodeString(base64QR)
+	if err != nil {
+		return nil, err
+	}
+	hexaSlice := hex.EncodeToString(decodedBase64)
+
 	constant := constant.QrisConstant
 	var constantRule map[string]interface{}
 
@@ -28,10 +36,10 @@ func GetTLV(base64QR string) (map[string]string, error) {
 	runningIndex := 0
 	tagMap := make(map[string]string)
 	for {
-		tagLabel := strings.ToUpper(base64QR[runningIndex : runningIndex+2])
+		tagLabel := strings.ToUpper(hexaSlice[runningIndex : runningIndex+2])
 
 		if tagLabel == "5F" || tagLabel == "9F" {
-			tagLabel = strings.ToUpper(base64QR[runningIndex : runningIndex+4])
+			tagLabel = strings.ToUpper(hexaSlice[runningIndex : runningIndex+4])
 		}
 
 		if constantRule["tag"+tagLabel] == nil {
@@ -42,9 +50,9 @@ func GetTLV(base64QR string) (map[string]string, error) {
 
 		tagLenExpected := ""
 		if tagLabel[0:2] == "5F" || tagLabel[0:2] == "9F" {
-			tagLenExpected = strings.ToUpper(base64QR[runningIndex+4 : runningIndex+6])
+			tagLenExpected = strings.ToUpper(hexaSlice[runningIndex+4 : runningIndex+6])
 		} else {
-			tagLenExpected = strings.ToUpper(base64QR[runningIndex+2 : runningIndex+4])
+			tagLenExpected = strings.ToUpper(hexaSlice[runningIndex+2 : runningIndex+4])
 		}
 
 		tagLenDecimalExpected, _ := strconv.ParseUint(hexaNumberToInteger("0x"+tagLenExpected), 16, 64)
@@ -57,7 +65,7 @@ func GetTLV(base64QR string) (map[string]string, error) {
 		}
 
 		tagValueEndIndex := tagValueStartIndex + int(tagLenDecimalExpected*2)
-		tagValue := base64QR[tagValueStartIndex:tagValueEndIndex]
+		tagValue := hexaSlice[tagValueStartIndex:tagValueEndIndex]
 		isRulelengthConsidered := false
 
 		if tagRule["length"] != "" {
@@ -69,7 +77,7 @@ func GetTLV(base64QR string) (map[string]string, error) {
 		}
 
 		if tagLabel == "61" || tagLabel == "63" {
-			if tagValueEndIndex != len(base64QR) {
+			if tagValueEndIndex != len(hexaSlice) {
 				return nil, errors.New("invalid length, expected and actual length not match for tag : " + tagLabel)
 			}
 			tagValueEndIndex = runningIndex + 4
@@ -77,7 +85,7 @@ func GetTLV(base64QR string) (map[string]string, error) {
 		runningIndex = tagValueEndIndex
 		tagMap[tagLabel] = tagValue
 
-		if runningIndex == len(base64QR) {
+		if runningIndex == len(hexaSlice) {
 			break
 		}
 	}
