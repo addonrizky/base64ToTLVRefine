@@ -1,3 +1,3 @@
-module qrcpm/base64totlv
+module github.com/addonrizky/base64ToTLVRefine
 
 go 1.12

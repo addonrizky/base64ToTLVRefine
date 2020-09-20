@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"qrcpm/base64totlv/constant"
+	"github.com/addonrizky/base64ToTLVRefine/constant"
 )
 
 //GetTLV is a function to conver base64 QR into TLV EMV in QRIS rule
