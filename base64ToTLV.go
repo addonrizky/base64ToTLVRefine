@@ -83,7 +83,7 @@ func GetTLV(base64QR string) (map[string]string, error) {
 			tagValueEndIndex = runningIndex + 4
 		}
 		runningIndex = tagValueEndIndex
-		tagMap[tagLabel] = tagValue
+		tagMap[tagLabel] = strings.ToUpper(tagValue)
 
 		if runningIndex == len(hexaSlice) {
 			break
