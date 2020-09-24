@@ -1,4 +1,4 @@
-package base64totlvrefine
+package base64ToTLVRefine
 
 import (
 	"encoding/base64"
@@ -6,8 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
+
+	"regexp"
 
 	"github.com/addonrizky/base64ToTLVRefine/constant"
 )
@@ -21,7 +24,15 @@ func GetTLV(base64QR string) (map[string]string, error) {
 		}
 	}()
 
-	decodedBase64, err := base64.StdEncoding.DecodeString(base64QR)
+	// Make a Regex to say we only want letters and numbers
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	base64QRTrimmed := reg.ReplaceAllString(base64QR, "")
+
+	decodedBase64, err := base64.RawStdEncoding.DecodeString(base64QRTrimmed)
 	if err != nil {
 		return nil, err
 	}
@@ -34,6 +45,7 @@ func GetTLV(base64QR string) (map[string]string, error) {
 	json.Unmarshal([]byte(constant), &constantRule)
 
 	runningIndex := 0
+	//counter := 0
 	tagMap := make(map[string]string)
 	for {
 		tagLabel := strings.ToUpper(hexaSlice[runningIndex : runningIndex+2])
@@ -55,6 +67,16 @@ func GetTLV(base64QR string) (map[string]string, error) {
 			tagLenExpected = strings.ToUpper(hexaSlice[runningIndex+2 : runningIndex+4])
 		}
 
+		//issuer anomaly spec
+		if tagLenExpected == "81" {
+			runningIndex += 2
+			if tagLabel[0:2] == "5F" || tagLabel[0:2] == "9F" {
+				tagLenExpected = strings.ToUpper(hexaSlice[runningIndex+4 : runningIndex+6])
+			} else {
+				tagLenExpected = strings.ToUpper(hexaSlice[runningIndex+2 : runningIndex+4])
+			}
+		}
+
 		tagLenDecimalExpected, _ := strconv.ParseUint(hexaNumberToInteger("0x"+tagLenExpected), 16, 64)
 
 		tagValueStartIndex := 0
@@ -63,7 +85,6 @@ func GetTLV(base64QR string) (map[string]string, error) {
 		} else {
 			tagValueStartIndex = runningIndex + 4
 		}
-
 		tagValueEndIndex := tagValueStartIndex + int(tagLenDecimalExpected*2)
 		tagValue := hexaSlice[tagValueStartIndex:tagValueEndIndex]
 		isRulelengthConsidered := false
@@ -84,6 +105,11 @@ func GetTLV(base64QR string) (map[string]string, error) {
 		}
 		runningIndex = tagValueEndIndex
 		tagMap[tagLabel] = strings.ToUpper(tagValue)
+		//counter++
+		//
+		//if counter == 2 {
+		//	break
+		//}
 
 		if runningIndex == len(hexaSlice) {
 			break
