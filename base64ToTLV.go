@@ -25,7 +25,7 @@ func GetTLV(base64QR string) (map[string]string, error) {
 	}()
 
 	// Make a Regex to say we only want letters and numbers
-	reg, err := regexp.Compile("[^a-z0-9]+Z/i")
+	reg, err := regexp.Compile("=+$")
 	if err != nil {
 		log.Fatal(err)
 	}
