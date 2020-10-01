@@ -6,11 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
-
-	"regexp"
 
 	"github.com/addonrizky/base64ToTLVRefine/constant"
 )
@@ -25,14 +22,14 @@ func GetTLV(base64QR string) (map[string]string, error) {
 	}()
 
 	// Make a Regex to say we only want letters and numbers
-	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	/*reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	base64QRTrimmed := reg.ReplaceAllString(base64QR, "")
+	base64QRTrimmed := reg.ReplaceAllString(base64QR, "")*/
 
-	decodedBase64, err := base64.RawStdEncoding.DecodeString(base64QRTrimmed)
+	decodedBase64, err := base64.RawStdEncoding.DecodeString(base64QR)
 	if err != nil {
 		return nil, err
 	}
