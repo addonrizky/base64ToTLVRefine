@@ -55,7 +55,7 @@ func init() {
 				},
 				"tag9F08" : {
 					"desc" : "application version number",
-					"length" : "2",
+					"length" : "02",
 					"val" : "9F08"
 				},
 				"tag9F19" : {
