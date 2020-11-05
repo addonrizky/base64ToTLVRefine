@@ -97,12 +97,28 @@ func GetTLV(base64QR string) (map[string]string, error) {
 			return nil, errors.New("invalid length " + tagLabel)
 		}
 
-		if tagLabel == "61" || tagLabel == "63" {
+		if tagLabel == "61" {
+			if tagValueEndIndex != len(hexaSlice) {
+				fmt.Println(hexaSlice[tagValueEndIndex : tagValueEndIndex+2])
+				return nil, errors.New("invalid length, expected and actual length not match for tag : " + tagLabel)
+			}
+			tagValueEndIndex = runningIndex + 4
+		}
+
+		if tagLabel == "63" {
 			if tagValueEndIndex != len(hexaSlice) {
 				return nil, errors.New("invalid length, expected and actual length not match for tag : " + tagLabel)
 			}
 			tagValueEndIndex = runningIndex + 4
 		}
+
+		if tagLabel == "64" {
+			if tagValueEndIndex != len(hexaSlice) {
+				return nil, errors.New("invalid length, expected and actual length not match for tag : " + tagLabel)
+			}
+			tagValueEndIndex = runningIndex + 4
+		}
+
 		runningIndex = tagValueEndIndex
 		tagMap[tagLabel] = strings.ToUpper(tagValue)
 		//counter++
