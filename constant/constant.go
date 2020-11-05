@@ -113,7 +113,12 @@ func init() {
 						"length" : "",
 						"val" : "9F74"
 					},
-		
+			"tag62" : {
+				"desc" : "Common Data Transparent Template",
+				"length" : "",
+				"val" : "62"
+			},
+
 			"status_qrcpm_inquiried" : 1,
 			"status_qrcpm_flagged" : 2,
 			"status_qrcpm_reversed" : 3,
