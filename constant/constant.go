@@ -34,7 +34,7 @@ func init() {
 				},
 				"tag5A" : {
 					"desc" : "application PAN",
-					"length" : "0A",
+					"length" : "",
 					"val" : "5A",
 					"defaultHex" : "93 60"
 				},
