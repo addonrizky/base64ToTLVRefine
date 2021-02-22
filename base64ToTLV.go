@@ -94,7 +94,7 @@ func GetTLV(base64QR string) (map[string]string, error) {
 		}
 
 		if isRulelengthConsidered == true && tagLenExpected != tagRule["length"] {
-			return nil, errors.New("invalid length " + tagLabel)
+			return nil, errors.New("invalid lengthzzzzz " + tagLabel)
 		}
 
 		if tagLabel == "61" {
